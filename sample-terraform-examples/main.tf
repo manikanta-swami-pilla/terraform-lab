@@ -2,8 +2,8 @@
 
 module "ec2_instance" {
   source            = "./modules/ec2_instance"
-  instance_type     = ""
-  ami_id            = ""
-  region            = ""
-  instance_name_tag = ""
+  instance_type     = var.instance_type
+  ami_id            = var.ami_id
+  region            = var.region
+  instance_name_tag = var.instance_name_tag
 }
