@@ -1,11 +1,8 @@
-# Define the AWS provider configuration.
-variable "cidr" {
-  default = "10.0.0.0/16"
-}
+
 
 resource "aws_key_pair" "example" {
-  key_name   = "terraform-demo-mani"  # Replace with your desired key name
-  public_key = file("~/.ssh/id_rsa.pub") # Replace with the path to your public key file
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
 }
 
 resource "aws_vpc" "myvpc" {
@@ -14,8 +11,8 @@ resource "aws_vpc" "myvpc" {
 
 resource "aws_subnet" "sub1" {
   vpc_id                  = aws_vpc.myvpc.id
-  cidr_block              = "10.0.0.0/24"
-  availability_zone       = "ap-south-2a"
+  cidr_block              = var.subnet_cidr
+  availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
 }
 
@@ -69,23 +66,23 @@ resource "aws_security_group" "webSg" {
 }
 
 resource "aws_instance" "server" {
-  ami                    = "ami-03748893c3fc9f55e"
-  instance_type          = "t3.small"
-  key_name      = aws_key_pair.example.key_name
+  ami                    = var.ami
+  instance_type          = var.instance_type
+  key_name               = aws_key_pair.example.key_name
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub1.id
 
   connection {
     type        = "ssh"
-    user        = "ec2-user"  # Replace with the appropriate username for your EC2 instance
-    private_key = file("~/.ssh/id_rsa") # Replace with the path to your private key
+    user        = var.ssh_user
+    private_key = file(var.private_key_path)
     host        = self.public_ip
   }
 
   # File provisioner to copy a file from local to the remote EC2 instance
   provisioner "file" {
-    source      = "app.py"  # Replace with the path to your local file
-    destination = "/home/ec2-user/app.py"  # Replace with the path on the remote instance
+    source      = var.app_source
+    destination = var.app_destination
   }
 
   provisioner "remote-exec" {
