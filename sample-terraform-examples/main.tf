@@ -7,3 +7,5 @@ module "ec2_instance" {
   region            = var.region
   instance_name_tag = var.instance_name_tag
 }
+
+# Let me raise pull request
