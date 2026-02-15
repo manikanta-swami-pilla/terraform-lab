@@ -1,13 +1,6 @@
 # Creating EC2 instance using module and passing variables through terraform.tfvars file
-terraform {
-  required_version = "~>1.11"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 6.3"
-    }
-  }
+provider "aws" {
+  region = "ap-south-2"
 }
 
 module "ec2_instance" {
@@ -17,4 +10,4 @@ module "ec2_instance" {
   region            = "ap-south-2"
 }
 
-# Let me raise pull request 12
+# Let me raise pull request 13
