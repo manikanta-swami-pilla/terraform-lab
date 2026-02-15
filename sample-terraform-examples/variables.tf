@@ -9,7 +9,6 @@ variable "instance_type" {
 variable "region" {
   description = "value for region"
   type        = string
-  default     = "ap-south-2"
 }
 
 variable "ami_id" {
@@ -20,5 +19,4 @@ variable "ami_id" {
 variable "instance_name_tag" {
   description = "value for instance name tag"
   type        = string
-  default     = "BEStateEC2Server"
 }   
