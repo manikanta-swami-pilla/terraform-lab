@@ -8,4 +8,4 @@ module "ec2_instance" {
   instance_name_tag = var.instance_name_tag
 }
 
-# Let me raise pull request 7
+# Let me raise pull request 8
