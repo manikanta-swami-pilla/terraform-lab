@@ -47,6 +47,7 @@ jobs:
             security-team
           minimum-approvals: 1
 
+
   apply:
     runs-on: self-hosted
     needs: approval
