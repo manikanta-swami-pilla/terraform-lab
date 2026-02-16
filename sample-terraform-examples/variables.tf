@@ -15,11 +15,9 @@ variable "instance_type" {
 variable "ami_id" {
   description = "value for ami"
   type = string
-  default = "ami-02774d409be696d81"
 }
 
 variable "instance_name_tag" {
   description = "value for instance name tag"
   type        = string
-  default     = "ManagedEC2Server"
 }
