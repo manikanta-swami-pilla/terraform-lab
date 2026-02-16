@@ -1,3 +1,8 @@
+variable "user_data" {
+  description = "User data script to run at instance launch."
+  type        = string
+  default     = null
+}
 variable "ami_id" {
   description = "value for ami"
   type        = string
