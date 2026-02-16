@@ -5,9 +5,11 @@ provider "aws" {
 
 module "ec2_instance" {
   source            = "./modules/ec2_instance"
-  instance_type     = "t3.small"
-  ami_id            = "ami-02774d409be696d81"
-  region            = "ap-south-2"
+  instance_type     = var.instance_type
+  ami_id            = var.ami_id
+  region            = var.region
+  instance_name_tag = var.instance_name_tag
 }
+
 
 # Let me raise pull request 15
