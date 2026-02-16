@@ -6,7 +6,7 @@ provider "aws" {
 module "ec2_instance" {
   source            = "./modules/ec2_instance"
   instance_type     = "t3.small"
-  ami_id            = ""
+  ami_id            = "ami-02774d409be696d81"
   region            = "ap-south-2"
 }
 
