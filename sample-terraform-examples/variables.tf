@@ -3,6 +3,7 @@
 variable "environment" {
   description = "Environment for which the S3 bucket is being created (e.g., dev, staging, prod)"
   type        = string
+  default     = "dev"
 }
 variable "region" {
   description = "AWS region to create resources in"
