@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket       = "tf-state-and-lock-bucket-2026-02-12" # change this
+    bucket       = var.bucket_name
     key          = "terraform.tfstate"
-    region       = "ap-south-2"
+    region       = var.region
     encrypt      = true
     use_lockfile = true
   }
