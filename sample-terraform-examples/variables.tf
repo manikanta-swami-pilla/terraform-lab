@@ -1,15 +1,5 @@
 # Variables for Main Terraform configuration
 
-variable "bucket_name" {
-  description = "Name of the S3 bucket to be created"
-  type        = string
-}
-
-variable "key" {
-  description = "Key for the S3 object in the bucket"
-  type        = string
-}
-
 variable "environment" {
   description = "Environment for which the S3 bucket is being created (e.g., dev, staging, prod)"
   type        = string
@@ -28,7 +18,7 @@ variable "instance_type" {
 
 variable "ami_id" {
   description = "value for ami"
-  type = string
+  type        = string
 }
 
 variable "instance_name_tag" {
