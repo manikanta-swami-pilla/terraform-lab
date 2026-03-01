@@ -4,6 +4,10 @@ variable "region" {
   description = "AWS region to create resources in"
   type        = string
   default     = "ap-south-2"
+  validation {
+    condition     = contains(["ap-south-2", "us-west-2", "eu-west-1"], var.region)
+    error_message = "Region must be one of: ap-south-2, us-west-2, eu-west-1."
+  }
 }
 
 variable "instance_type" {
