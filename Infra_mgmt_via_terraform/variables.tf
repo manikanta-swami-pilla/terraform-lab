@@ -1,10 +1,5 @@
 # Variables for Main Terraform configuration
 
-variable "environment" {
-  description = "Environment for which the S3 bucket is being created (e.g., dev, staging, prod)"
-  type        = string
-  default     = "dev"
-}
 variable "region" {
   description = "AWS region to create resources in"
   type        = string
@@ -27,3 +22,7 @@ variable "instance_name_tag" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "VPC ID where the EC2 instance will be launched"
+  type        = string
+}

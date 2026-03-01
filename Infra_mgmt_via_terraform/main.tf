@@ -11,7 +11,7 @@ module "ec2_instance" {
   ami_id            = var.ami_id
   region            = var.region
   instance_name_tag = var.instance_name_tag
+  vpc_id            = var.vpc_id
 }
-
 
 # Let me raise pull request 21

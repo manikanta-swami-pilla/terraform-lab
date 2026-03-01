@@ -1,16 +1,9 @@
 plugin "aws" {
   enabled = true
+  version = "0.33.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-aws"
 }
 
-rule "aws_instance_invalid_type" {
-  enabled = true
-}
-
-rule "aws_s3_bucket_invalid_name" {
-  enabled = true
-}
-
-# Enable all default rules
-rule "terraform_unused_declarations" {
+plugin "terraform" {
   enabled = true
 }

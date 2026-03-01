@@ -24,3 +24,9 @@ override.tf.json
 # Ignore Terraform CLI config
 .terraformrc
 terraform.rc
+
+# Ignore Terraform log files
+*.log
+
+# Ignore tflint files
+.tflint.hcl
