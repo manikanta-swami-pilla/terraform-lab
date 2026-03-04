@@ -1,15 +1,26 @@
+# ================================
+# Terraform CI/CD Workflow
+# ================================
 name: Terraform CI/CD
 
 on:
+  # Trigger workflow automatically on push to files in Infra_mgmt_via_terraform or workflow file itself
   push:
     paths:
       - 'Infra_mgmt_via_terraform/**'
       - '.github/workflows/terraform.yml'
+  # Trigger workflow automatically on pull requests that touch infra or workflow file
   pull_request:
     paths:
       - 'Infra_mgmt_via_terraform/**'
       - '.github/workflows/terraform.yml'
+  # Manual trigger (important for destroy job)
+  workflow_dispatch:
 
+# ================================
+# Environment Variables
+# These are passed into Terraform as TF_VAR_* variables
+# ================================
 env:
   TF_VAR_region: ${{ vars.REGION }}
   TF_VAR_instance_type: ${{ vars.INSTANCE_TYPE }}
@@ -17,12 +28,16 @@ env:
   TF_VAR_instance_name_tag: ${{ vars.INSTANCE_NAME_TAG }}
   TF_VAR_vpc_id: ${{ vars.VPC_ID }}
 
+# ================================
+# Job 1: Terraform Plan
+# Runs on every push/PR to preview changes
+# ================================
 jobs:
   terraform-plan:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
+      id-token: write   # Required for OIDC authentication
+      contents: read    # Allows reading repo contents
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,7 +45,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}   # stored securely in GitHub vars
+          role-to-assume: ${{ secrets.AWS_ROLE_DEV }}   # Dev role stored securely
           aws-region: ${{ vars.REGION }}
 
       - name: Setup Terraform
@@ -48,11 +63,15 @@ jobs:
         working-directory: Infra_mgmt_via_terraform
         run: terraform plan
 
+# ================================
+# Job 2: Terraform Apply
+# Runs only on push to main branch (production deploy)
+# ================================
   terraform-apply:
-    needs: terraform-plan
+    needs: terraform-plan   # Apply only after plan succeeds
     runs-on: ubuntu-latest
     environment:
-      name: production
+      name: production      # GitHub environment for approvals/protection
       url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:
@@ -65,7 +84,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}   # stored securely in GitHub vars
+          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}   # Prod role stored securely
           aws-region: ${{ vars.REGION }}
 
       - name: Setup Terraform
@@ -77,4 +96,35 @@ jobs:
 
       - name: Terraform Apply
         working-directory: Infra_mgmt_via_terraform
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve   # Auto-approve for CI/CD
+
+# ================================
+# Job 3: Terraform Destroy
+# Runs only when manually triggered via workflow_dispatch
+# ================================
+  terraform-destroy:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'   # Ensures destroy runs only manually
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}   # Use prod role for destruction
+          aws-region: ${{ vars.REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: Infra_mgmt_via_terraform
+        run: terraform init
+
+      - name: Terraform Destroy
+        working-directory: Infra_mgmt_via_terraform
+        run: terraform destroy -auto-approve   # Auto-approve to avoid manual prompt
