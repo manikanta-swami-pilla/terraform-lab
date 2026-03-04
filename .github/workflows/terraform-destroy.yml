@@ -63,3 +63,4 @@ jobs:
       - name: Terraform Destroy
         working-directory: Infra_mgmt_via_terraform
         run: terraform destroy -auto-approve
+        
