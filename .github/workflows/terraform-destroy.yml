@@ -1,31 +1,65 @@
+# ================================
+# Terraform Destroy Workflow
+# ================================
 name: Terraform Destroy
 
 on:
-  workflow_dispatch:   # Manual trigger only
+  workflow_dispatch:   #  Manual trigger only (Run workflow button in Actions tab)
+
+# ================================
+# Environment Variables
+# These are passed into Terraform as TF_VAR_* variables
+# Make sure you define these in GitHub repo → Settings → Variables
+# ================================
+env:
+  TF_VAR_region: ${{ vars.REGION }}
+  TF_VAR_instance_type: ${{ vars.INSTANCE_TYPE }}
+  TF_VAR_ami_id: ${{ vars.AMI_ID }}
+  TF_VAR_instance_name_tag: ${{ vars.INSTANCE_NAME_TAG }}
+  TF_VAR_vpc_id: ${{ vars.VPC_ID }} 
 
 jobs:
   terraform-destroy:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
-      contents: read
+      id-token: write   # Required for OIDC authentication
+      contents: read    # Allows reading repo contents
     steps:
+      # ================================
+      # Step 1: Checkout repo code
+      # ================================
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ================================
+      # Step 2: Configure AWS credentials via OIDC
+      # Uses GitHub → AWS trust relationship instead of static keys
+      # ================================
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}
+          role-to-assume: ${{ secrets.AWS_ROLE_PROD }}   # IAM role stored securely in repo secrets
           aws-region: ${{ vars.REGION }}
 
+      # ================================
+      # Step 3: Setup Terraform CLI
+      # ================================
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
 
+      # ================================
+      # Step 4: Terraform Init
+      # Initializes backend, providers, and state before destroy
+      # ================================
       - name: Terraform Init
         working-directory: Infra_mgmt_via_terraform
         run: terraform init
 
+      # ================================
+      # Step 5: Terraform Destroy
+      # Tears down all resources tracked in state
+      # -auto-approve skips manual confirmation (safe in CI/CD)
+      # ================================
       - name: Terraform Destroy
         working-directory: Infra_mgmt_via_terraform
         run: terraform destroy -auto-approve
